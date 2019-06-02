@@ -10,11 +10,11 @@ namespace RecipeSavants.Microservices.Caching
     {
         private IDistributedCache redis;
         private int cacheLife;
-        private int cacheType;
+        private CacheType cacheType;
         private string key;
         private LoggingClient logger;
 
-        public RedisClient(LoggingClient _logger, IDistributedCache _redis, int _cacheLife, int _cacheType, string _key)
+        public RedisClient(LoggingClient _logger, IDistributedCache _redis, int _cacheLife, CacheType _cacheType, string _key)
         {
             redis = _redis;
             cacheLife = _cacheLife;
