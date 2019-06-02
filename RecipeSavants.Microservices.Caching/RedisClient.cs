@@ -1,20 +1,22 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using RecipeSavants.Microservices.Logging;
+using StackExchange.Redis;
+using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
 using System.Threading.Tasks;
 
 namespace RecipeSavants.Microservices.Caching
 {
-    public class RedisClient
+    public class RedisClient<T> where T: class
     {
-        private IDistributedCache redis;
+        private IRedisCacheClient redis;
         private int cacheLife;
         private CacheType cacheType;
         private string key;
         private LoggingClient logger;
 
-        public RedisClient(LoggingClient _logger, IDistributedCache _redis, int _cacheLife, CacheType _cacheType, string _key)
+        public RedisClient(LoggingClient _logger, IRedisCacheClient _redis, int _cacheLife, CacheType _cacheType, string _key)
         {
             redis = _redis;
             cacheLife = _cacheLife;
@@ -23,22 +25,26 @@ namespace RecipeSavants.Microservices.Caching
             cacheType = _cacheType;
         }
 
-        public string Fetch(string Key)
+        public T Fetch(string Key)
         {
-            var t = redis.GetString(Key);
+            var t = redis.Db0.Get<T>(key);
             if (t != null)
             {
                 logger.LogDebug($"Value fetched from Redis cache - key {Key}");
+            }
+            if(CacheType.Sliding == cacheType)
+            {
+                redis.Db0.Add<T>(key, t, TimeSpan.FromMinutes(this.cacheLife));
             }
             return t;
         }
 
 
-        public async Task DeleteKey(string Key)
+        public async Task DeleteKey(string key)
         {
             try
             {
-                await redis.RemoveAsync(Key);
+                await redis.Db0.RemoveAsync(key);
             }
             catch (Exception e)
             {
@@ -46,7 +52,7 @@ namespace RecipeSavants.Microservices.Caching
             }
         }
 
-        public void Post(string value, string Key)
+        public void Post(T value, string key)
         {
             if (cacheLife == 0)
             {
@@ -57,20 +63,13 @@ namespace RecipeSavants.Microservices.Caching
             switch (cacheType)
             {
                 case CacheType.Absolute:
-                    redis.SetString(Key, value, new DistributedCacheEntryOptions()
-                    {
-                        AbsoluteExpiration = DateTime.Now.AddMinutes(cacheLife)
-                    });
+                    redis.Db0.Add<T>(key, value, TimeSpan.FromMinutes(this.cacheLife));
                     break;
                 case CacheType.Sliding:
-                    redis.SetString(Key, value, new DistributedCacheEntryOptions()
-                    {
-                        SlidingExpiration = new TimeSpan(0, 0, cacheLife, 0),
-                        AbsoluteExpiration = DateTime.Now.AddMinutes((int)Utilities.MinutesToMidnight())
-                    });
+                    redis.Db0.Add<T>(key, value, TimeSpan.FromMinutes(this.cacheLife));
                     break;
             }
-            logger.LogDebug($"Value updated in {t} cache - key {Key} at {DateTime.Now}");
+            logger.LogDebug($"Value updated in {t} cache - key {key} at {DateTime.Now}");
         }
     }
 }

@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeSavants.Microservices.Logging", "RecipeSavants.Microservices.Logging\RecipeSavants.Microservices.Logging.csproj", "{2C098297-B88D-4599-B247-A27FD45FDEC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecipeSavants.Microservices.Logging", "RecipeSavants.Microservices.Logging\RecipeSavants.Microservices.Logging.csproj", "{2C098297-B88D-4599-B247-A27FD45FDEC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeSavants.Microservices.Filters", "RecipeSavants.Microservices.Filters\RecipeSavants.Microservices.Filters.csproj", "{78567CDF-BC1D-4DC2-98CE-7FDA2772FE9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecipeSavants.Microservices.Filters", "RecipeSavants.Microservices.Filters\RecipeSavants.Microservices.Filters.csproj", "{78567CDF-BC1D-4DC2-98CE-7FDA2772FE9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeSavants.Microservices.Caching", "RecipeSavants.Microservices.Caching\RecipeSavants.Microservices.Caching.csproj", "{FAE29614-84D9-4D38-926F-50249B40353F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecipeSavants.Microservices.Caching", "RecipeSavants.Microservices.Caching\RecipeSavants.Microservices.Caching.csproj", "{FAE29614-84D9-4D38-926F-50249B40353F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeSavants.Microservices.Utilities", "RecipeSavants.Microservices.Utilities\RecipeSavants.Microservices.Utilities.csproj", "{E24851D1-EF5F-41A4-8FC1-0DB7655D5656}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RecipeSavants.Microservices.Utilities", "RecipeSavants.Microservices.Utilities\RecipeSavants.Microservices.Utilities.csproj", "{E24851D1-EF5F-41A4-8FC1-0DB7655D5656}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeSavants.Microservices.DocumentRepository", "RecipeSavants.Microservices.DocumentRepository\RecipeSavants.Microservices.DocumentRepository.csproj", "{5F70D19B-1B47-4879-B9D5-2710E32BC989}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{E24851D1-EF5F-41A4-8FC1-0DB7655D5656}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E24851D1-EF5F-41A4-8FC1-0DB7655D5656}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E24851D1-EF5F-41A4-8FC1-0DB7655D5656}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F70D19B-1B47-4879-B9D5-2710E32BC989}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F70D19B-1B47-4879-B9D5-2710E32BC989}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F70D19B-1B47-4879-B9D5-2710E32BC989}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F70D19B-1B47-4879-B9D5-2710E32BC989}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
