@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="obj\Debug\netcoreapp2.0\Gremlin.Net.CosmosDb.AssemblyInfo.cs" />
+    <Compile Include="obj\Debug\netstandard2.0\Germlin.net.AssemblyInfo.cs" />
+    <Compile Include="obj\Debug\netstandard2.0\Gremlin.Net.CosmosDb.AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="bin\Debug\netcoreapp2.0\Gremlin.Net.CosmosDb.deps.json" />
+    <Content Include="bin\Debug\netstandard2.0\Gremlin.Net.CosmosDb.deps.json" />
+    <Content Include="obj\Debug\netcoreapp2.0\Gremlin.Net.CosmosDb.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Debug\netstandard2.0\Gremlin.Net.CosmosDb.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Germlin.net.csproj.nuget.dgspec.json" />
+    <Content Include="obj\Gremlin.Net.CosmosDb.csproj.nuget.dgspec.json" />
+    <Content Include="obj\project.assets.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bin\Debug\Gremlin.Net.CosmosDb.0.3.4.4-rc1.nupkg" />
+    <None Include="bin\Debug\netcoreapp2.0\Gremlin.Net.CosmosDb.dll" />
+    <None Include="bin\Debug\netcoreapp2.0\Gremlin.Net.CosmosDb.pdb" />
+    <None Include="bin\Debug\netstandard2.0\Gremlin.Net.CosmosDb.dll" />
+    <None Include="bin\Debug\netstandard2.0\Gremlin.Net.CosmosDb.pdb" />
+    <None Include="Gremlin.Net.CosmosDb.csproj" />
+    <None Include="obj\Debug\Gremlin.Net.CosmosDb.0.3.4.4-rc1.nuspec" />
+    <None Include="obj\Debug\netcoreapp2.0\Gremlin.Net.CosmosDb.AssemblyInfoInputs.cache" />
+    <None Include="obj\Debug\netcoreapp2.0\Gremlin.Net.CosmosDb.assets.cache" />
+    <None Include="obj\Debug\netcoreapp2.0\Gremlin.Net.CosmosDb.csproj.CoreCompileInputs.cache" />
+    <None Include="obj\Debug\netcoreapp2.0\Gremlin.Net.CosmosDb.csprojAssemblyReference.cache" />
+    <None Include="obj\Debug\netcoreapp2.0\Gremlin.Net.CosmosDb.dll" />
+    <None Include="obj\Debug\netcoreapp2.0\Gremlin.Net.CosmosDb.pdb" />
+    <None Include="obj\Debug\netstandard2.0\Germlin.net.AssemblyInfoInputs.cache" />
+    <None Include="obj\Debug\netstandard2.0\Germlin.net.assets.cache" />
+    <None Include="obj\Debug\netstandard2.0\Germlin.net.csproj.CoreCompileInputs.cache" />
+    <None Include="obj\Debug\netstandard2.0\Gremlin.Net.CosmosDb.AssemblyInfoInputs.cache" />
+    <None Include="obj\Debug\netstandard2.0\Gremlin.Net.CosmosDb.assets.cache" />
+    <None Include="obj\Debug\netstandard2.0\Gremlin.Net.CosmosDb.csproj.CoreCompileInputs.cache" />
+    <None Include="obj\Debug\netstandard2.0\Gremlin.Net.CosmosDb.csprojAssemblyReference.cache" />
+    <None Include="obj\Debug\netstandard2.0\Gremlin.Net.CosmosDb.dll" />
+    <None Include="obj\Debug\netstandard2.0\Gremlin.Net.CosmosDb.pdb" />
+    <None Include="obj\Germlin.net.csproj.nuget.cache" />
+    <None Include="obj\Germlin.net.csproj.nuget.g.props" />
+    <None Include="obj\Germlin.net.csproj.nuget.g.targets" />
+    <None Include="obj\Gremlin.Net.CosmosDb.csproj.nuget.cache" />
+    <None Include="obj\Gremlin.Net.CosmosDb.csproj.nuget.g.props" />
+    <None Include="obj\Gremlin.Net.CosmosDb.csproj.nuget.g.targets" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Gremlin.Net" Version="3.4.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+</Project>
