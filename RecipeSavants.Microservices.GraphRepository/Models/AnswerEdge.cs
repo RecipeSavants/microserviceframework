@@ -5,8 +5,9 @@ using System.Text;
 
 namespace RecipeSavants.Microservices.GraphRepository.Models
 {
-    public class UserQuestionVertext : ManyToManyEdge<UserVertex, QuestionVertex>
+    public class AnswerEdge:IVertex
     {
-        public string Id { get; set; }
+        public string Answer { get; set; }
+        public DateTime TimeStamp { get; set; }
     }
 }

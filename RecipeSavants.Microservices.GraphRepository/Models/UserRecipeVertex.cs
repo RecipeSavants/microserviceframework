@@ -7,5 +7,6 @@ namespace RecipeSavants.Microservices.GraphRepository.Models
 {
     public class UserRecipeVertex: ManyToManyEdge<UserVertex,RecipeVertex>
     {
+        public string Id { get; set; }
     }
 }
