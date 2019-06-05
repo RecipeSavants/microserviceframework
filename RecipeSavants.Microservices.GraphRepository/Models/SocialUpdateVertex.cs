@@ -1,12 +1,15 @@
-﻿using Gremlin.Net.CosmosDb.Structure;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace RecipeSavants.Microservices.GraphRepository.Models
 {
-    public class SocialUpdateVertex:IVertex
+    public class SocialUpdateVertex
     {
+        public string id {get;set;}
+        public DateTime TimeStamp { get; set; }
+
         public UserVertex User { get; set;}
         public string Title { get; set; }
         public string Body { get; set; }

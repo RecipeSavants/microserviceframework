@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
+using System;
 
 namespace RecipeSavants.Microservices.GraphRepository.Models
 {
-    public class QuestionVertex
+    public class AnswerVertex
     {
         public string id {get;set;}
-        public string Title { get; set; }
         public string Body { get; set; }
-        public List<string> ImageUrl { get; set; }
         public DateTime TimeStamp { get; set; }
-
     }
 }
