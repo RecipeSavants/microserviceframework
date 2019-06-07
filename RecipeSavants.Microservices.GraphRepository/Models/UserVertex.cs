@@ -10,10 +10,6 @@ namespace RecipeSavants.Microservices.GraphRepository.Models
         public string id {get;set;}
         public DateTime CreateDate { get; set; }
         public DateTime LastUpdateDate { get; set; }
-
-        public List<UserVertex> Follows { get; set; }
-        public List<UserVertex> Block { get; set; }
-
         public string UserName { get; set; }
         public string FullName { get; set; }
         public string PostalCode { get; set; }
@@ -39,6 +35,5 @@ namespace RecipeSavants.Microservices.GraphRepository.Models
         public bool IsPinterestLinkVisible { get; set; }
         public bool IsInstagramVisible { get; set; }
         public string BackgroundUrl { get; set; }
-
     }
 }
