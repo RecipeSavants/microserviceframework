@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\gremlin.linq\Gremlin.Linq\Gremlin.Linq.csproj" />
+    <ProjectReference Include="..\Germlin.Linq\Germlin.Linq.csproj" />
   </ItemGroup>
 
   <ItemGroup>
