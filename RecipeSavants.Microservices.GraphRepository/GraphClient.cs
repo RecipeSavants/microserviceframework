@@ -14,8 +14,19 @@ namespace RecipeSavants.Microservices.GraphRepository
         {
             client = new GremlinGraphClient("recipesavantssocialgraph.gremlin.cosmos.azure.com", "users", "folks", "q34qF9Yf5jtfSJLJqNmqNl1JJPxhUwCUThyJvGqou9DcWceCkv4S3sTf4A8ZnaUAQakNqxpAF0qHt14UoXXfkA==");
         }
-
-        public async Task AddUserVertex(string User)
+        
+        public async Task AddSocialPost(SocialUpdateVertex Update, string User)
+        {
+            Update.Title == Update.Title ?? "";
+            Update.Body == Update.Body ?? "";
+            Update.Url == Update.Url ?? new List<string>();
+            Update.ImageUrl = Update.ImageUrl ?? new List<string>();
+            await client.Add(Update).SubmitAsync();
+            var u11 = await client.From<UserVertex>().Where(w => w.id == User1).SubmitWithSingleResultAsync();
+            await client.SubmitAsync(client.ConnectVerticies<SocialUpdateVertex, UserVertex>(u11, Update, "update").BuildGremlinQuery());
+        }
+        
+        public async Task AddUserVertex(UserVertex User)
         {
             UserVertex v = new UserVertex()
             {
