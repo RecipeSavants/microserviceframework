@@ -15,13 +15,25 @@ namespace RecipeSavants.Microservices.GraphRepository
             client = new GremlinGraphClient("recipesavantssocialgraph.gremlin.cosmos.azure.com", "users", "folks", "q34qF9Yf5jtfSJLJqNmqNl1JJPxhUwCUThyJvGqou9DcWceCkv4S3sTf4A8ZnaUAQakNqxpAF0qHt14UoXXfkA==");
         }
         
+        public async Task AddAnswer(string QuestionID, string Body, string User)
+        {
+            var a = new AnswerVertex() {
+                Body = Body ?? "", TimeStamp = DateTime.UtcNow()
+            };
+            await client.Add(a).SubmitAsync();
+            var u11 = await client.From<UserVertex>().Where(w => w.id == User).SubmitWithSingleResultAsync();
+            var q = await.client.From<QuestionVertex>().Where(w=>w.id==QuestionId).SubmitWithSingleResultAsync();
+            await client.SubmitAsync(client.ConnectVerticies<QuestionVertex, AnswerVertex>(q,a, "answer").BuildGremlinQuery());
+            await client.SubmitAsync(client.ConnectVerticies<UserVertex, AnswerVertex>(u11, a, "answers").BuildGremlinQuery());
+        }
+        
         public async Task AddQuestion(QuestionVertex Question, string User)
         {
             Question.Title = Question.Title ?? "";
             Question.Body = Question.Body ?? "";
             Question.ImageUrl = Question.ImageUrl ?? new List<string>();
             Question.TimeStamp = DateTime.UtcNow();
-            await client.Add(r).SubmitAsync();
+            await client.Add(Question).SubmitAsync();
             var u11 = await client.From<UserVertex>().Where(w => w.id == User).SubmitWithSingleResultAsync();
             await client.SubmitAsync(client.ConnectVerticies<QuestionVertex, UserVertex>(u11, r, "asks").BuildGremlinQuery());
         }
