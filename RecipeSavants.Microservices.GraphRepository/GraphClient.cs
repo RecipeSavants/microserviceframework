@@ -15,6 +15,17 @@ namespace RecipeSavants.Microservices.GraphRepository
             client = new GremlinGraphClient("recipesavantssocialgraph.gremlin.cosmos.azure.com", "users", "folks", "q34qF9Yf5jtfSJLJqNmqNl1JJPxhUwCUThyJvGqou9DcWceCkv4S3sTf4A8ZnaUAQakNqxpAF0qHt14UoXXfkA==");
         }
         
+        public async Task AddQuestion(QuestionVertex Question, string User)
+        {
+            Question.Title = Question.Title ?? "";
+            Question.Body = Question.Body ?? "";
+            Question.ImageUrl = Question.ImageUrl ?? new List<string>();
+            Question.TimeStamp = DateTime.UtcNow();
+            await client.Add(r).SubmitAsync();
+            var u11 = await client.From<UserVertex>().Where(w => w.id == User).SubmitWithSingleResultAsync();
+            await client.SubmitAsync(client.ConnectVerticies<QuestionVertex, UserVertex>(u11, r, "asks").BuildGremlinQuery());
+        }
+        
         public async Task AddRecipeRating(string RecipeId, int Rating, string User)
         {
             if(RecipeId == null)
