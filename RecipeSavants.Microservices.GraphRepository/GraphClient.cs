@@ -22,7 +22,7 @@ namespace RecipeSavants.Microservices.GraphRepository
             Update.Url == Update.Url ?? new List<string>();
             Update.ImageUrl = Update.ImageUrl ?? new List<string>();
             await client.Add(Update).SubmitAsync();
-            var u11 = await client.From<UserVertex>().Where(w => w.id == User1).SubmitWithSingleResultAsync();
+            var u11 = await client.From<UserVertex>().Where(w => w.id == User).SubmitWithSingleResultAsync();
             await client.SubmitAsync(client.ConnectVerticies<SocialUpdateVertex, UserVertex>(u11, Update, "update").BuildGremlinQuery());
         }
         
