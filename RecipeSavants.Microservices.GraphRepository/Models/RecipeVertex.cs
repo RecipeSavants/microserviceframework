@@ -9,7 +9,6 @@ namespace RecipeSavants.Microservices.GraphRepository.Models
     {
         public string id {get;set;}
         public string RecipeId { get; set; }
-        public UserVertex User { get; set; }
         public int Rating { get; set; }
         public DateTime TimeStamp { get; set; }
 
