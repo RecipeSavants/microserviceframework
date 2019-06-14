@@ -28,6 +28,17 @@ namespace RecipeSavants.Microservices.GraphRepository
             await client.SubmitAsync(client.ConnectVerticies<UserVertex, AnswerVertex>(u11, a, "answers").BuildGremlinQuery());
         }
         
+        public async Task AddTip(TipVertex Tip, string User)
+        {
+            Tip.id = Guid.NewGuid().ToString();
+            Tip.Title = Tip.Title ?? "";
+            Tip.Body = Tip.Body ?? "";
+            await client.Add(Tip).SubmitAsync();
+            var u = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
+            var t = await client.From<TipVertex>().Where(w => w.id == Tip.id).SubmitWithSingleResultAsync();
+            await client.SubmitAsync(client.ConnectVerticies<TipVertex, UserVertex>(t, u, "tips").BuildGremlinQuery());
+        }
+        
         public async Task AddQuestion(QuestionVertex Question, string User)
         {
             Question.id = Guid.NewGuid().ToString();
@@ -36,7 +47,7 @@ namespace RecipeSavants.Microservices.GraphRepository
             Question.ImageUrl = Question.ImageUrl ?? new List<string>();
             Question.TimeStamp = DateTime.UtcNow;
             await client.Add(Question).SubmitAsync();
-            var u11 = await client.From<UserVertex>().Where(w => w.id == User).SubmitWithSingleResultAsync();
+            var u11 = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
             var q = await client.From<QuestionVertex>().Where(w => w.id == Question.id).SubmitWithSingleResultAsync();
             await client.SubmitAsync(client.ConnectVerticies<QuestionVertex, UserVertex>(q, u11, "asks").BuildGremlinQuery());
         }
@@ -53,10 +64,24 @@ namespace RecipeSavants.Microservices.GraphRepository
                     RecipeId = RecipeId, Rating = Rating, TimeStamp = DateTime.UtcNow, id = Guid.NewGuid().ToString()
                 };
                 await client.Add(r).SubmitAsync();
-                var u11 = await client.From<UserVertex>().Where(w => w.id == User).SubmitWithSingleResultAsync();
+                var u11 = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
                 var recipe = await client.From<RecipeVertex>().Where(w => w.id == r.id).SubmitWithSingleResultAsync();
                 await client.SubmitAsync(client.ConnectVerticies<RecipeVertex, UserVertex>(recipe,u11, "rating").BuildGremlinQuery());
             }
+        }
+        
+        public async Task AddTipComment(SocialCommentVertex comment, string TipId, string User)
+        {
+            comment.id = Guid.NewGuid().ToString();
+            comment.Title = comment.Title ?? "";
+            comment.Body = comment.Body ?? "";
+            comment.ImageUrl = comment.ImageUrl ?? new List<string>();
+            await client.Add(comment).SubmitAsync();
+            var s = await client.From<TipVertex>().Where(w => w.id == TipId).SubmitWithSingleResultAsync();
+            var u = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
+            var c = await client.From<SocialCommentVertex>().Where(w => w.id == comment.id).SubmitWithSingleResultAsync();
+            await client.SubmitAsync(client.ConnectVerticies<SocialCommentVertex, TipVertex>(c,s, "comment").BuildGremlinQuery());
+            await client.SubmitAsync(client.ConnectVerticies<SocialCommentVertex, UserVertex>(c, u, "tipcomment").BuildGremlinQuery());
         }
 
         public async Task AddSocialComment(SocialCommentVertex comment, string SocialId, string User)
@@ -67,7 +92,7 @@ namespace RecipeSavants.Microservices.GraphRepository
             comment.ImageUrl = comment.ImageUrl ?? new List<string>();
             await client.Add(comment).SubmitAsync();
             var s = await client.From<SocialUpdateVertex>().Where(w => w.id == SocialId).SubmitWithSingleResultAsync();
-            var u = await client.From<UserVertex>().Where(w => w.id == User).SubmitWithSingleResultAsync();
+            var u = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
             var c = await client.From<SocialCommentVertex>().Where(w => w.id == comment.id).SubmitWithSingleResultAsync();
             await client.SubmitAsync(client.ConnectVerticies<SocialCommentVertex, SocialUpdateVertex>(c,s, "comment").BuildGremlinQuery());
             await client.SubmitAsync(client.ConnectVerticies<SocialCommentVertex, UserVertex>(c, u, "socialcomment").BuildGremlinQuery());
@@ -75,7 +100,7 @@ namespace RecipeSavants.Microservices.GraphRepository
 
         public async Task CommentLike(string SocialCommentId, string User)
         {
-            var u = await client.From<UserVertex>().Where(w => w.id == User).SubmitWithSingleResultAsync();
+            var u = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
             var c = await client.From<SocialCommentVertex>().Where(w => w.id == SocialCommentId).SubmitWithSingleResultAsync();
             await client.SubmitAsync(client.ConnectVerticies<SocialCommentVertex, UserVertex>(c, u, "like").BuildGremlinQuery());
 
@@ -83,7 +108,7 @@ namespace RecipeSavants.Microservices.GraphRepository
 
         public async Task SocialPostLike(string PostId, string User)
         {
-            var u = await client.From<UserVertex>().Where(w => w.id == User).SubmitWithSingleResultAsync();
+            var u = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
             var c = await client.From<SocialUpdateVertex>().Where(w => w.id == PostId).SubmitWithSingleResultAsync();
             await client.SubmitAsync(client.ConnectVerticies<SocialUpdateVertex, UserVertex>(c, u, "like").BuildGremlinQuery());
         }
@@ -97,7 +122,7 @@ namespace RecipeSavants.Microservices.GraphRepository
             Update.ImageUrl = Update.ImageUrl ?? new List<string>();
             await client.Add(Update).SubmitAsync();
             var social = await client.From<SocialUpdateVertex>().Where(w => w.id == Update.id).SubmitWithSingleResultAsync();
-            var u11 = await client.From<UserVertex>().Where(w => w.id == User).SubmitWithSingleResultAsync();
+            var u11 = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
             await client.SubmitAsync(client.ConnectVerticies<SocialUpdateVertex, UserVertex>(social,u11, "update").BuildGremlinQuery());
         }
         
@@ -140,8 +165,8 @@ namespace RecipeSavants.Microservices.GraphRepository
         public async Task AddUserFriend(string User1, string User2)
         {
             //find the users
-            var u11 = await client.From<UserVertex>().Where(w => w.id == User1).SubmitWithSingleResultAsync();
-            var u22 = await client.From<UserVertex>().Where(w => w.id == User2).SubmitWithSingleResultAsync();
+            var u11 = await client.From<UserVertex>().Where(w => w.id == User1.ToLower()).SubmitWithSingleResultAsync();
+            var u22 = await client.From<UserVertex>().Where(w => w.id == User2.ToLower()).SubmitWithSingleResultAsync();
             await client.SubmitAsync(client.ConnectVerticies<UserVertex, UserVertex>(u11, u22, "follows").BuildGremlinQuery());
         }
     }
