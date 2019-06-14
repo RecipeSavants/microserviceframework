@@ -1,5 +1,11 @@
 public class SocialUpdateModel
 {
-   public SocialUpdateVertex {get;set;}
-   public List<SocialCommentVertex> {get;set;}
+   public SocialUpdateVertex Update {get;set;}
+   public List<SocialCommentVertex> Comments {get;set;}
+   
+   public SocialUpdateModel()
+   {
+      Update = new SocialUpdateVertex();
+      Comments = new List<SocialCommentVertex>();
+   }
 }
