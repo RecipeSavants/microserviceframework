@@ -149,8 +149,6 @@ namespace RecipeSavants.Microservices.GraphRepository
                 IsTwitterLinkVisible = false,
                 LastActivityDate = DateTime.UtcNow,
                 LastUpdateDate = DateTime.UtcNow,
-                Latitude = 0,
-                Longitude = 0,
                 PhotoPath = User.PhotoPath ?? "",
                 Pintrest = User.Pintrest ?? "",
                 PostalCode = User.PostalCode ?? "",
