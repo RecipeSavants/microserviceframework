@@ -7,11 +7,10 @@ namespace ConsoleApp1
     {
         static async System.Threading.Tasks.Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
             GraphClient g = new GraphClient("users");
-            await g.AddUserVertex("Robert3");
-            //await g.AddUserVertex("Robert2");
-            //await g.AddUserFriend("robert1", "robert2");
+            await g.AddUserVertex(new RecipeSavants.Microservices.GraphRepository.Models.UserVertex() { UserName = "Robert3" });
+            await g.AddUserVertex(new RecipeSavants.Microservices.GraphRepository.Models.UserVertex() { UserName = "Robert4" });
+            await g.AddUserFriend("Robert3", "Robert4");
         }
     }
 }

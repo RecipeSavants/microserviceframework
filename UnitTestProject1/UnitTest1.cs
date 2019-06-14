@@ -11,9 +11,9 @@ namespace UnitTestProject1
         public async Task TestMethod1()
         {
             GraphClient g = new GraphClient("users");
-            await g.AddUserVertex("Robert1");
-            await g.AddUserVertex("Robert2");
-            await g.AddUserFriend("Robert1", "Robert2");
+            await g.AddUserVertex(new RecipeSavants.Microservices.GraphRepository.Models.UserVertex() { UserName = "Robert3" });
+            await g.AddUserVertex(new RecipeSavants.Microservices.GraphRepository.Models.UserVertex() { UserName = "Robert4" });
+            await g.AddUserFriend("Robert3", "Robert4");
         }
     }
 }
