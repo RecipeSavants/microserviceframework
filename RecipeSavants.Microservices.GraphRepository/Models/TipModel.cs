@@ -1,7 +1,10 @@
-public TipModel
+using RecipeSavants.Microservices.GraphRepository.Models;
+using System.Collections.Generic;
+
+public class TipModel
 {
   public TipVertex Tip {get;set;}
-  public List<SocialCommmentVertex> Comments {get;set;}
+  public List<SocialCommentVertex> Comments {get;set;}
   
   public TipModel()
   {

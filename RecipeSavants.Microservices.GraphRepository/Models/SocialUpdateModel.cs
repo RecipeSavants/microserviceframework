@@ -1,3 +1,6 @@
+using RecipeSavants.Microservices.GraphRepository.Models;
+using System.Collections.Generic;
+
 public class SocialUpdateModel
 {
    public SocialUpdateVertex Update {get;set;}
