@@ -97,13 +97,33 @@ namespace RecipeSavants.Microservices.GraphRepository
             await client.SubmitAsync(client.ConnectVerticies<SocialCommentVertex, SocialUpdateVertex>(c,s, "comment").BuildGremlinQuery());
             await client.SubmitAsync(client.ConnectVerticies<SocialCommentVertex, UserVertex>(c, u, "socialcomment").BuildGremlinQuery());
         }
+        
+        public async Task AddGroupUpdateComment(GroupUpdateCommentVertex comment, string GroupUpdateId, string User)
+        {
+            comment.id = Guid.NewGuid().ToString();
+            comment.Title = comment.Title ?? "";
+            comment.Body = comment.Body ?? "";
+            comment.ImageUrl = comment.ImageUrl ?? new List<string>();
+            await client.Add(comment).SubmitAsync();
+            var s = await client.From<GroupUpdateVertex>().Where(w => w.id == GroupUpdateId).SubmitWithSingleResultAsync();
+            var u = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
+            var c = await client.From<GroupUpdateCommentVertex>().Where(w => w.id == comment.id).SubmitWithSingleResultAsync();
+            await client.SubmitAsync(client.ConnectVerticies<GroupUpdateCommentVertex, GroupUpdateVertex>(c,s, "comment").BuildGremlinQuery());
+            await client.SubmitAsync(client.ConnectVerticies<GroupUpdateCommentVertex, UserVertex>(c, u, "groupcomment").BuildGremlinQuery());
+        }
+        
+        public async Task GroupUpdateCommentLike(string SocialCommentId, string User)
+        {
+            var u = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
+            var c = await client.From<GroupUpdateCommentVertex>().Where(w => w.id == SocialCommentId).SubmitWithSingleResultAsync();
+            await client.SubmitAsync(client.ConnectVerticies<SocialCommentVertex, UserVertex>(c, u, "like").BuildGremlinQuery());
+        }
 
         public async Task CommentLike(string SocialCommentId, string User)
         {
             var u = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
             var c = await client.From<SocialCommentVertex>().Where(w => w.id == SocialCommentId).SubmitWithSingleResultAsync();
             await client.SubmitAsync(client.ConnectVerticies<SocialCommentVertex, UserVertex>(c, u, "like").BuildGremlinQuery());
-
         }
 
         public async Task SocialPostLike(string PostId, string User)
@@ -111,6 +131,21 @@ namespace RecipeSavants.Microservices.GraphRepository
             var u = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
             var c = await client.From<SocialUpdateVertex>().Where(w => w.id == PostId).SubmitWithSingleResultAsync();
             await client.SubmitAsync(client.ConnectVerticies<SocialUpdateVertex, UserVertex>(c, u, "like").BuildGremlinQuery());
+        }
+        
+        public async Task AddGroupPost(GroupUpdateVertex Update, string User)
+        {
+            Update.id = Guid.NewGuid().ToString();
+            Update.Title = Update.Title ?? "";
+            Update.Body = Update.Body ?? "";
+            Update.Url = Update.Url ?? new List<string>();
+            Update.ImageUrl = Update.ImageUrl ?? new List<string>();
+            await client.Add(Update).SubmitAsync();
+            var social = await client.From<GroupUpdateVertex>().Where(w => w.id == Update.id).SubmitWithSingleResultAsync();
+            var u11 = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
+            var g = await client.From<GroupVertex>().Where(w=>w.id==Update.GroupId).SubmitWithSingleResultAsync();
+            await client.SubmitAsync(client.ConnectVerticies<GroupUpdateVertex, UserVertex>(social,u11, "group update").BuildGremlinQuery());
+            await client.SubmitAsync(client.ConnectVerticies<GroupUpdateVertex, GroupVertex>(social,g, "post").BuildGremlinQuery());
         }
         
         public async Task AddSocialPost(SocialUpdateVertex Update, string User)
