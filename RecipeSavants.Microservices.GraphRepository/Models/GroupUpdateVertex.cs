@@ -1,4 +1,4 @@
-public class GroupUpdteVertex
+public class GroupUpdateVertex
 {
         public string id {get;set;}
         public string GroupId {get;set;}
