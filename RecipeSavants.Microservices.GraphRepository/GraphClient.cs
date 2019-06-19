@@ -133,6 +133,37 @@ namespace RecipeSavants.Microservices.GraphRepository
             await client.SubmitAsync(client.ConnectVerticies<SocialUpdateVertex, UserVertex>(c, u, "like").BuildGremlinQuery());
         }
         
+        public async Task AddGroup(GroupVertex Group, string User)
+        {
+            Group.id = Guid.NewGuid().ToString();
+            Group.Name = Group.Name ?? "";
+            Group.BackgroundPhotoUrl ?? "";
+            Group.Description = Group.Description ?? "";
+            Group.Admins.Add(User);
+            await client.Add(Group).SubmitAsync();
+        }
+        
+        public async Task AddGroupMember(string GroupId, string User)
+        {
+            var g = await client.From<GroupVertex>().Where(w=>w.id==GroupId).SubmitWithSingleResultAsync();
+            var u = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
+            await client.SubmitAsync(client.ConnectVerticies<GroupVertex, UserVertex>(g,u, "member").BuildGremlinQuery());
+        }
+        
+        public async Task AddGroupMember(string GroupId, string User)
+        {
+            var g = await client.From<GroupVertex>().Where(w=>w.id==GroupId).SubmitWithSingleResultAsync();
+            var u = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
+            await client.SubmitAsync(client.ConnectVerticies<GroupVertex, UserVertex>(g,u, "member").BuildGremlinQuery());
+        }
+        
+        public async Task RemoveGroupMember(string GroupId, string User)
+        {
+            var g = await client.From<GroupVertex>().Where(w=>w.id==GroupId).SubmitWithSingleResultAsync();
+            var u = await client.From<UserVertex>().Where(w => w.id == User.ToLower()).SubmitWithSingleResultAsync();
+            await client.SubmitAsync(client.ConnectVerticies<GroupVertex, UserVertex>(g,u, "member").BuildGremlinQuery());
+        }
+        
         public async Task AddGroupPost(GroupUpdateVertex Update, string User)
         {
             Update.id = Guid.NewGuid().ToString();
