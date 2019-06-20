@@ -8,18 +8,10 @@ namespace ConsoleApp1
         static async System.Threading.Tasks.Task Main(string[] args)
         {
             GraphClient g = new GraphClient("users");
-            //await g.AddUserVertex(new RecipeSavants.Microservices.GraphRepository.Models.UserVertex() { UserName = "Robert3" });
-            //await g.AddUserVertex(new RecipeSavants.Microservices.GraphRepository.Models.UserVertex() { UserName = "Robert4" });
-            //await g.AddUserFriend("Robert3", "Robert4");
-
-            //robert1 robert2
-
-            //add new group
-            Console.WriteLine(await g.FetchGroups());
-           Console.WriteLine(await g.FetchMember("robert2"));
-            //var id = await g.AddGroup(new GroupVertex() { Name = "Robert Group" }, "robert1");
-            //await g.AddGroupMember(id, "robert3");
-            //await g.DeactivateGroupMember(id, "robert3");
+            var id = await g.AddGroup(new GroupVertex() { Name = "Robert Group" }, "robert1");
+            var id2 = await g.AddGroupPost(new GroupUpdateVertex() { Body = "Robert Group Id", GroupId = id }, "robert1");
+            var id3 = await g.AddGroupUpdateComment(new GroupUpdateCommentVertex { Body = "Robert Group Robert Group ID Comment" }, id2, "robert1");
+            var t = g.HydrateGroupModel(id);
             Console.ReadLine();
         }
     }
