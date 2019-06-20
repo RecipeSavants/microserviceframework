@@ -126,10 +126,7 @@ namespace RecipeSavants.Microservices.GraphRepository
 
         public async Task AddUserFollows(string User1, string User2)
         {
-            //find the users
-            var u1 = await FetchMember(User1);
-            var u2 = await FetchMember(User2);
-            await client.SubmitAsync(client.ConnectVerticies<UserVertex, UserVertex>(u1, u2, "follows").BuildGremlinQuery());
+            await client.SubmitAsync($"g.V('{User1.ToLower()}').addE('follows').to(g.V('{User2.ToLower()}')")
         }
 
         public async Task RemoveUserFollows(string User1, string User2)
@@ -150,10 +147,8 @@ namespace RecipeSavants.Microservices.GraphRepository
                 TimeStamp = DateTime.UtcNow
             };
             await client.Add(a).SubmitAsync();
-            var u = await FetchMember(User);
-            var q = await FetchQuestion(QuestionID);
-            await client.SubmitAsync(client.ConnectVerticies<QuestionVertex, AnswerVertex>(q, a, "answers").BuildGremlinQuery());
-            await client.SubmitAsync(client.ConnectVerticies<UserVertex, AnswerVertex>(u, a, "answers").BuildGremlinQuery());
+            await client.SubmitAsync($"g.V('{QuestionId}').addE('answers').to(g.V('{a.id}'))");
+            await client.SubmitAsync($"g.V('{User.ToLower()}').addE('answers').to(g.V('{QuestionID}'))");
             return a.id;
         }
 
@@ -165,8 +160,7 @@ namespace RecipeSavants.Microservices.GraphRepository
             Question.ImageUrl = Question.ImageUrl ?? new List<string>();
             Question.TimeStamp = DateTime.UtcNow;
             await client.Add(Question).SubmitAsync();
-            var u = await FetchMember(User);
-            await client.SubmitAsync(client.ConnectVerticies<UserVertex, QuestionVertex>(u,Question, "asks").BuildGremlinQuery());
+            await client.SubmitAsync($"g.V('{User.ToLower()}').addE('asks').to(g.V('{Question.id}'))");
             return Question.id;
         }
 
@@ -179,8 +173,7 @@ namespace RecipeSavants.Microservices.GraphRepository
             Tip.Title = Tip.Title ?? "";
             Tip.Body = Tip.Body ?? "";
             await client.Add(Tip).SubmitAsync();
-            var u = await FetchMember(User);
-            await client.SubmitAsync(client.ConnectVerticies<UserVertex, TipVertex>(u,Tip, "tips").BuildGremlinQuery());
+            await client.SubmitAsync($"g.V('{User.ToLower()}').addE('tips').to(g.V('{Tip.id}'))");
             return Tip.id;
         }
 
@@ -191,8 +184,7 @@ namespace RecipeSavants.Microservices.GraphRepository
             comment.Body = comment.Body ?? "";
             comment.ImageUrl = comment.ImageUrl ?? new List<string>();
             await client.Add(comment).SubmitAsync();
-            var t = await FetchTip(TipId);
-            await client.SubmitAsync(client.ConnectVerticies<TipVertex, SocialCommentVertex>(t,comment, "comments").BuildGremlinQuery());
+            await client.SubmitAsync($"g.V('{TipId}').addE('comments').to(g.V('{comment.id}'))");
             return comment.id;
         }
 
@@ -207,23 +199,18 @@ namespace RecipeSavants.Microservices.GraphRepository
             comment.Body = comment.Body ?? "";
             comment.ImageUrl = comment.ImageUrl ?? new List<string>();
             await client.Add(comment).SubmitAsync();
-            var s = await FetchUpdate(SocialId);
-            await client.SubmitAsync(client.ConnectVerticies<SocialUpdateVertex, SocialCommentVertex>(s, comment, "comments").BuildGremlinQuery());
+            await client.SubmitAsync($"g.V('{SocialId}').addE('comments').to(g.V('{comment.id}'))");
             return comment.id;
         }
 
         public async Task SocialPostLike(string PostId, string User)
         {
-            var u = await FetchMember(User);
-            var c = await FetchUpdate(PostId);
-            await client.SubmitAsync(client.ConnectVerticies<UserVertex, SocialUpdateVertex>(u,c, "likes").BuildGremlinQuery());
+            await client.SubmitAsync($"g.V('{User.ToLower()}').addE('likes').to(g.V('{PostId}'))");
         }
 
         public async Task CommentLike(string SocialCommentId, string User)
         {
-            var u = await FetchMember(User);
-            var c = await FetchComment(SocialCommentId);
-            await client.SubmitAsync(client.ConnectVerticies<UserVertex, SocialCommentVertex>(u, c, "likes").BuildGremlinQuery());
+            await client.SubmitAsync($"g.V('{User.ToLower()}').addE('likes').to(g.V('{SocialCommentId}'))");
         }
 
         public async Task<string> AddSocialPost(SocialUpdateVertex Update, string User)
@@ -234,8 +221,6 @@ namespace RecipeSavants.Microservices.GraphRepository
             Update.Url = Update.Url ?? new List<string>();
             Update.ImageUrl = Update.ImageUrl ?? new List<string>();
             await client.Add(Update).SubmitAsync();
-            var u = await FetchMember(User);
-            await client.SubmitAsync(client.ConnectVerticies<UserVertex, SocialUpdateVertex>(u,Update, "update").BuildGremlinQuery());
             return Update.id;
         }
 
@@ -270,10 +255,8 @@ namespace RecipeSavants.Microservices.GraphRepository
             Update.Url = Update.Url ?? new List<string>();
             Update.ImageUrl = Update.ImageUrl ?? new List<string>();
             await client.Add(Update).SubmitAsync();
-            var u = await FetchMember(User);
-            var g = await FetchGroup(Update.GroupId);
-            await client.SubmitAsync(client.ConnectVerticies<UserVertex, GroupUpdateVertex>(u, Update, "update").BuildGremlinQuery());
-            await client.SubmitAsync(client.ConnectVerticies<GroupVertex, GroupUpdateVertex>(g, Update, "update").BuildGremlinQuery());
+            await client.SubmitAsync($"g.V('{User.ToLower()}').addE('Update').to(g.V('{Update.id}'))");
+            await client.SubmitAsync($"g.V('{Update.GroupId}').addE('Update').to(g.V('{Update.id}'))");
             return Update.id;
         }
 
@@ -284,31 +267,25 @@ namespace RecipeSavants.Microservices.GraphRepository
             comment.Body = comment.Body ?? "";
             comment.ImageUrl = comment.ImageUrl ?? new List<string>();
             await client.Add(comment).SubmitAsync();
-            var s = await FetchGroupUpdate(GroupUpdateId);
-            var u = await FetchMember(User);
-            await client.SubmitAsync(client.ConnectVerticies<GroupUpdateVertex, GroupUpdateCommentVertex>(s,comment, "comments").BuildGremlinQuery());
+            await client.SumbitAsync($"g.V('{GroupUpdateId}').addE('comments').to(g.V('{comment.id}'))");
             return comment.id;
         }
 
         public async Task GroupUpdateCommentLike(string SocialCommentId, string User)
         {
-            var u = await FetchMember(User);
-            var c = await FetchGroupComment(SocialCommentId);
+            await client.SubmitAsync($"g.V('{User.ToLower()}').addE('likes').to(g.V('{SocialCommentId}'))");
             await client.SubmitAsync(client.ConnectVerticies<UserVertex, GroupUpdateCommentVertex>(u,c, "likes").BuildGremlinQuery());
         }
 
 
         public async Task AddGroupMember(string GroupId, string User)
         {
-            var g = await FetchGroup(GroupId);
-            var u = await FetchMember(User);
-            await client.SubmitAsync(client.ConnectVerticies<UserVertex, GroupVertex>(u,g, "member").BuildGremlinQuery());
+            await client.SubmitAsync($"g.V('{User.ToLower()}').addE('member').to(g.V('{GroupId}'))");
         }
 
         public async Task DeactivateGroupMember(string GroupId, string User)
         {
             var gg = await FetchGroup(GroupId);
-            var u = await FetchMember(User);
             await client.SubmitAsync($"g.V().has('id','{gg.Id}').outE('member').where(inV().has('id','{User.ToLower()}')).drop())");
         }
 
@@ -331,14 +308,14 @@ namespace RecipeSavants.Microservices.GraphRepository
                     id = Guid.NewGuid().ToString()
                 };
                 await client.Add(r).SubmitAsync();
-                var u = await FetchMember(User);
-                await client.SubmitAsync(client.ConnectVerticies<UserVertex, RecipeVertex>(u, r, "rating").BuildGremlinQuery());
+                await client.SubmitAsync($"g.V('{User.ToLower()}').addE('rates').to(g.V('{RecipeId}'))");
             }
         }
 
         public async Task HydrateGroupModel(string GroupId)
         {
-            var g = await FetchGroup(GroupId);
+            var g = client.SubmitAsync($"g.V('{GroupId}')");
+            var u = client.SubmitAsync($"g.V('{GroupId}').outE('Update').inV().hasLabel('GroupUpdateVertex').outE('Comments').inV().hasLabel('GroupUpdateCommentVertex')");
             var u = await FetchAllPostsForGroup(GroupId);
             var model = new GroupModel()
             {
