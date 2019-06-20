@@ -6,7 +6,7 @@ public class GroupUpdateModel
    public GroupUpdateVertex Update {get;set;}
    public List<GroupUpdateCommentVertex> Comments {get;set;}
    
-   public SocialUpdateModel()
+   public GroupUpdateModel()
    {
       Update = new GroupUpdateVertex();
       Comments = new List<GroupUpdateCommentVertex>();

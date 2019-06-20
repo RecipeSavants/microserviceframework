@@ -1,3 +1,7 @@
+using RecipeSavants.Microservices.GraphRepository.Models;
+using System;
+using System.Collections.Generic;
+
 public class GroupUpdateVertex
 {
         public string id {get;set;}
@@ -8,4 +12,11 @@ public class GroupUpdateVertex
         public UpdateType UpdateType { get; set; }
         public List<string> Url { get; set; }
         public List<string> ImageUrl { get; set; }
+
+    public GroupUpdateVertex()
+    {
+        UpdateType = new UpdateType();
+        Url = new List<string>();
+        ImageUrl = new List<string>();
+    }
 }
