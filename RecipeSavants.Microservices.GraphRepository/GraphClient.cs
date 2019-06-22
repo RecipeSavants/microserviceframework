@@ -126,7 +126,7 @@ namespace RecipeSavants.Microservices.GraphRepository
 
         public async Task AddUserFollows(string User1, string User2)
         {
-            await client.SubmitAsync($"g.V('{User1.ToLower()}').addE('follows').to(g.V('{User2.ToLower()}')")
+            await client.SubmitAsync($"g.V('{User1.ToLower()}').addE('follows').to(g.V('{User2.ToLower()}')");
         }
 
         public async Task RemoveUserFollows(string User1, string User2)
@@ -147,7 +147,7 @@ namespace RecipeSavants.Microservices.GraphRepository
                 TimeStamp = DateTime.UtcNow
             };
             await client.Add(a).SubmitAsync();
-            await client.SubmitAsync($"g.V('{QuestionId}').addE('answers').to(g.V('{a.id}'))");
+            await client.SubmitAsync($"g.V('{QuestionID}').addE('answers').to(g.V('{a.id}'))");
             await client.SubmitAsync($"g.V('{User.ToLower()}').addE('answers').to(g.V('{QuestionID}'))");
             return a.id;
         }
@@ -267,14 +267,13 @@ namespace RecipeSavants.Microservices.GraphRepository
             comment.Body = comment.Body ?? "";
             comment.ImageUrl = comment.ImageUrl ?? new List<string>();
             await client.Add(comment).SubmitAsync();
-            await client.SumbitAsync($"g.V('{GroupUpdateId}').addE('comments').to(g.V('{comment.id}'))");
+            await client.SubmitAsync($"g.V('{GroupUpdateId}').addE('comments').to(g.V('{comment.id}'))");
             return comment.id;
         }
 
         public async Task GroupUpdateCommentLike(string SocialCommentId, string User)
         {
             await client.SubmitAsync($"g.V('{User.ToLower()}').addE('likes').to(g.V('{SocialCommentId}'))");
-            await client.SubmitAsync(client.ConnectVerticies<UserVertex, GroupUpdateCommentVertex>(u,c, "likes").BuildGremlinQuery());
         }
 
 
@@ -314,14 +313,35 @@ namespace RecipeSavants.Microservices.GraphRepository
 
         public async Task HydrateGroupModel(string GroupId)
         {
-            var g = client.SubmitAsync($"g.V('{GroupId}')");
-            var u = client.SubmitAsync($"g.V('{GroupId}').outE('Update').inV().hasLabel('GroupUpdateVertex').outE('Comments').inV().hasLabel('GroupUpdateCommentVertex')");
-            var u = await FetchAllPostsForGroup(GroupId);
-            var model = new GroupModel()
+            try
             {
-                Group = g.Entity,
-                Updates = u
-            };
+                var xxx = await client.SubmitAsync<GroupUpdateCommentVertex>($"g.V('{GroupId}').outE('Update').inV().outE('comments')");
+                var g = await client.SubmitAsync<GroupVertex>($"g.V('{GroupId}')");
+                var u = await client.SubmitAsync<GroupUpdateVertex>($"g.V('{GroupId}').outE('Update')'");
+                Dictionary<string, List<GroupUpdateCommentVertex>> d = new Dictionary<string, List<GroupUpdateCommentVertex>>();
+                foreach (var item in u)
+                {
+                    var c = await client.SubmitAsync<GroupUpdateCommentVertex>($"g.V('{item.Entity.id}').outE('comments')");
+                    var l = new List<GroupUpdateCommentVertex>();
+                    foreach (var item2 in c)
+                    {
+                        l.Add(item2.Entity);
+                    }
+                    d.Add(item.Entity.id, l);
+                }
+                
+                var t = "";
+            }
+            catch (Exception e)
+            {
+                throw (e);
+            }
+            //var u = await FetchAllPostsForGroup(GroupId);
+            //var model = new GroupModel()
+            //{
+            //    Group = g.Entity,
+            //    Updates = u
+            //};
         }
     }
 }

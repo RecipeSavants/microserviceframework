@@ -6,8 +6,4 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\RecipeSavants.Microservices.GraphRepository\RecipeSavants.Microservices.GraphRepository.csproj" />
-  </ItemGroup>
-
 </Project>
