@@ -28,88 +28,171 @@ namespace RecipeSavants.Microservices.DocumentRepository
                 .AsEnumerable().FirstOrDefault();
         }
 
-        public void Delete(string id)
+       public List<T> GetByDocumentType<T>(int DocumentType) where T : class
         {
-            Document doc = client.CreateDocumentQuery(collection.SelfLink).Where(f => f.Id == id).Select(s => s).FirstOrDefault();
-            client.DeleteDocumentAsync(doc.SelfLink);
-        }
-
-        public async Task<List<T>> ExecuteSql<T>(string Sql) where T : class
-        {
-            return client.CreateDocumentQuery<T>(collection.SelfLink, Sql).ToList();
-        }
-
-        public async Task<List<T>> GetByDocumentType<T>(int DocumentType) where T : class
-        {
-            return client.CreateDocumentQuery<T>(collection.SelfLink, "SELECT * FROM c where c.DocumentType=" + DocumentType).ToList();
-        }
-
-        public async Task<List<T>> GetByDocumentTypeWhere<T>(int? DocumentType, Expression<Func<T, bool>> expression) where T : class
-        {
-            //var select = "SELECT * FROM c " + new QueryBuilder<T>(DocumentType).Where(expression).Where();
-            //return client.CreateDocumentQuery<T>(collection.SelfLink, select).ToList();
-            var select = "SELECT * FROM c " + new QueryBuilder<T>(null).Where(expression).Where();
-            return client.CreateDocumentQuery<T>(collection.SelfLink, select).ToList();
-        }
-
-        public async Task<List<T>> GetByDocumentTypeWhere<T>(int? DocumentType, Expression<Func<T, bool>> expression, Expression<Func<T, object>> select) where T : class
-        {
-            string columns = "SELECT ";
-            if (select != null && select.Body is NewExpression)
+            List<T> TT = new List<T>();
+            var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
+            var x =
+                client.CreateDocumentQuery(_collection.SelfLink, "SELECT * FROM c where c.DocumentType=" + DocumentType)
+                    .ToList();
+            foreach (var item in x)
             {
-                var ne = select.Body as NewExpression;
-                foreach (var item in ne.Arguments)
+                TT.Add(JsonConvert.DeserializeObject<T>(item.ToString()));
+            }
+            return TT;
+        }
+
+        public List<T> GetAllApproved<T>() where T : class
+        {
+            List<T> TT = new List<T>();
+            var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
+            var x = client.CreateDocumentQuery(_collection.SelfLink, "SELECT * FROM c where c.IsApproved=true").ToList();
+            foreach (var item in x)
+            {
+                string s = item.ToString();
+                s = s.Replace("{}", "[]");
+                TT.Add(JsonConvert.DeserializeObject<T>(s));
+            }
+            return TT;
+        }
+        public List<T> GetAllApprovedHasVideo<T>() where T : class
+        {
+            List<T> TT = new List<T>();
+            var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
+            var x = client.CreateDocumentQuery(_collection.SelfLink, "SELECT * FROM c where c.IsApproved=true and c.HasVideo=true").ToList();
+            foreach (var item in x)
+            {
+                string s = item.ToString();
+                s = s.Replace("{}", "[]");
+                TT.Add(JsonConvert.DeserializeObject<T>(s));
+            }
+            return TT;
+        }
+
+        public List<T> GetAllUserSumbittedNotApproved<T>() where T : class
+        {
+            List<T> TT = new List<T>();
+            var query = String.Format("select * from c where c.ProviderType=2 and c.IsApproved=false and c.IsInstructions=false",
+                "");
+            var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
+            var x = client.CreateDocumentQuery(_collection.SelfLink, query).ToList();
+            foreach (var item in x)
+            {
+                string s = item.ToString();
+                s = s.Replace("{}", "[]");
+                TT.Add(JsonConvert.DeserializeObject<T>(s));
+            }
+            return TT;
+        }
+
+        public List<T> GetAllUnapprovedNonNullTag<T>() where T : class
+        {
+            List<T> TT = new List<T>();
+            var query = String.Format("select * from c where c.IsApproved=false and c.IsInstructions=false and c.Tags != null",
+                "");
+            var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
+            var x = client.CreateDocumentQuery(_collection.SelfLink, query).ToList();
+            foreach (var item in x)
+            {
+                string s = item.ToString();
+                s = s.Replace("{}", "[]");
+                TT.Add(JsonConvert.DeserializeObject<T>(s));
+            }
+            return TT;
+        }
+
+        public List<T> GetUnapproved<T>() where T : class
+        {
+            List<T> TT = new List<T>();
+            var query = String.Format("select top 1000 * from c where c.IsApproved=false and c.IsInstructions=false",
+                "");
+            var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
+            var x = client.CreateDocumentQuery(_collection.SelfLink, query).ToList();
+            foreach (var item in x)
+            {
+                string s = item.ToString();
+                s = s.Replace("{}", "[]");
+                TT.Add(JsonConvert.DeserializeObject<T>(s));
+            }
+            return TT;
+        }
+
+        public List<T> GetByUser<T>(string User, bool isEdit) where T : class
+        {
+            List<T> TT = new List<T>();
+            var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
+            var sql = String.Format("select * from c where c.UpdateFK='{0}'", User);
+            var sql1 = String.Format("select * from c where c.UserFK='{0}'", User);
+            if (isEdit)
+            {
+                var x = client.CreateDocumentQuery(_collection.SelfLink, sql).ToList();
+                foreach (var item in x)
                 {
-                    if (item is MemberExpression)
+                    try
                     {
-                        columns += $"{(columns == "SELECT " ? "" : ",")} c.{(item as MemberExpression).Member.Name}";
+                        string s = item.ToString();
+                        s = s.Replace("{}", "[]");
+                        TT.Add(JsonConvert.DeserializeObject<T>(s));
+                    }
+                    catch
+                    {
+
                     }
                 }
-            }
-            var query = $"{columns} FROM c " + new QueryBuilder<T>(DocumentType).Where(expression).Where();
-            return client.CreateDocumentQuery<T>(collection.SelfLink, query).ToList();
-        }
-
-        public async Task<T> GetById<T>(string id) where T : class
-        {
-            var t = client.CreateDocumentQuery("dbs/" + database.Id + "/colls/" + collection.Id)
-                .Where(f => f.Id == id).Select(s => s).AsEnumerable().FirstOrDefault();
-            if (t != null)
-            {
-                return JsonConvert.DeserializeObject<T>(t.ToString());
-            }
-            return null;
-        }
-
-        public void InsertOrUpdate<T>(string id, T input) where T : class
-        {
-            var document = client.CreateDocumentQuery(collection.SelfLink).FirstOrDefault(d => d.Id == id);
-            if (document == null)
-            {
-                client.CreateDocumentAsync(collection.SelfLink, input);
+                return TT;
             }
             else
             {
-                client.UpsertDocumentAsync(collection.SelfLink, input);
+                var x = client.CreateDocumentQuery(_collection.SelfLink, sql1).ToList();
+                foreach (var item in x)
+                {
+                    TT.Add(JsonConvert.DeserializeObject<T>(item.ToString()));
+                }
+                return TT;
             }
         }
 
-        public async Task<Tuple<string, IList<T>>> QueryAndContinue<T>(string continuationToken, int take, string sql) where T : class
+
+        public List<string> GetIdList()
         {
-            var queryOptions = new FeedOptions { MaxItemCount = take };
-            if (!string.IsNullOrEmpty(continuationToken))
+            List<string> TT = new List<string>();
+            var t =
+                _client.CreateDocumentQuery("dbs/" + _database.Id + "/colls/" + _collection.Id)
+                    .Select(s => s.Id)
+                    .AsEnumerable()
+                    .ToList();
+            foreach (var item in t)
             {
-                queryOptions.RequestContinuation = continuationToken;
+                TT.Add(item);
             }
-            var dquery = client.CreateDocumentQuery<T>(collection.SelfLink, sql, queryOptions).AsDocumentQuery();
-            string queryContinuationToken = null;
-            var page = await dquery.ExecuteNextAsync<T>();
-            var queryResult = page.ToList();
-            if (dquery.HasMoreResults) queryContinuationToken = page.ResponseContinuation;
-            return new Tuple<string, IList<T>>(queryContinuationToken, queryResult);
+            return TT;
         }
 
-        public async Task<List<T>> GetByList<T>(string id) where T : class
+        public virtual T GetById<T>(string id) where T : class
+        {
+            try
+            {
+                var t =
+                    _client.CreateDocumentQuery("dbs/" + _database.Id + "/colls/" + _collection.Id)
+                        .Where(f => f.Id == id)
+                        .Select(s => s)
+                        .AsEnumerable()
+                        .FirstOrDefault();
+                if (t != null)
+                {
+                    string s = t.ToString();
+                    s = s.Replace("{}", "[]");
+                    return JsonConvert.DeserializeObject<T>(s);
+                }
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public List<T> GetByList<T>(string id) where T : class
         {
             List<T> TT = new List<T>();
             id.Replace(" ", string.Empty);
@@ -120,7 +203,7 @@ namespace RecipeSavants.Microservices.DocumentRepository
                 L.Add(item.Replace(" ", String.Empty));
             }
             var x =
-            (client.CreateDocumentQuery("dbs/" + database.Id + "/colls/" + collection.Id)
+            (_client.CreateDocumentQuery("dbs/" + _database.Id + "/colls/" + _collection.Id)
                 .Where(f => L.Contains(f.Id))
                 .Select(s => s)
                 .AsEnumerable()
@@ -130,6 +213,121 @@ namespace RecipeSavants.Microservices.DocumentRepository
                 string s = item.ToString();
                 s = s.Replace("{}", "[]");
                 TT.Add(JsonConvert.DeserializeObject<T>(s));
+            }
+            return TT;
+        }
+
+        public virtual void InsertOrUpdate<T>(string id, T input) where T : class
+        {
+            try
+            {
+                var document =
+                    _client.CreateDocumentQuery("dbs/" + _database.Id + "/colls/" + _collection.Id)
+                        .Where(d => d.Id == id)
+                        .AsEnumerable()
+                        .FirstOrDefault();
+                if (document == null)
+                {
+                    _client.CreateDocumentAsync("dbs/" + _database.Id + "/colls/" + _collection.Id, input);
+                }
+                else
+                {
+                    _client.UpsertDocumentAsync(_collection.SelfLink, input);
+                }
+            }
+            catch (Exception e)
+            {
+                throw (e);
+            }
+        }
+
+        public void Delete(string Id)
+        {
+            Document doc = GetDocument(Id);
+            _client.DeleteDocumentAsync(doc.SelfLink);
+        }
+
+        private Document GetDocument(string id)
+        {
+            return _client.CreateDocumentQuery(_collection.DocumentsLink)
+                .Where(d => d.Id == id)
+                .AsEnumerable()
+                .FirstOrDefault();
+        }
+
+        public List<T> GetByRandom<T>() where T : class
+        {
+            List<T> TT = new List<T>();
+            var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
+            var sql =
+                "select * from c where c.IsApproved=true and c.IsInstructions=false and (c.Synopsis = '' or c.Synopsis = null)";
+
+            var x = client.CreateDocumentQuery(_collection.SelfLink, sql).ToList();
+            foreach (var item in x)
+            {
+                try
+                {
+                    string s = item.ToString();
+                    s = s.Replace("{}", "[]");
+                    TT.Add(JsonConvert.DeserializeObject<T>(s));
+                }
+                catch
+                {
+
+                }
+            }
+            return TT;
+        }
+
+        public List<T> GetByNotInList<T>(List<string> List) where T : class
+        {
+            List<T> TT = new List<T>();
+            var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
+            var qualifier = "";
+            foreach (var item in List)
+            {
+                qualifier += String.Format("'{0}',", item);
+            }
+            qualifier = qualifier.Substring(0, qualifier.Length - 1);
+            var sql =
+                String.Format(
+                    "select top 20 * from c where c.IsApproved=true and c.IsInstructions=false and c.id not in ({0})",
+                    qualifier);
+
+            var x = client.CreateDocumentQuery(_collection.SelfLink, sql).ToList();
+            foreach (var item in x)
+            {
+                try
+                {
+                    string s = item.ToString();
+                    s = s.Replace("{}", "[]");
+                    TT.Add(JsonConvert.DeserializeObject<T>(s));
+                }
+                catch
+                {
+
+                }
+            }
+            return TT;
+        }
+
+        public List<T> ExecuteSql<T>(string Sql) where T : class
+        {
+            List<T> TT = new List<T>();
+            var client = new DocumentClient(new Uri(EndpointUrl), AuthorizationKey);
+            var x = client.CreateDocumentQuery(_collection.SelfLink, Sql).ToList();
+            foreach (var item in x)
+            {
+                try
+                {
+                    string s = item.ToString();
+                    s = s.Replace("{}", "[]");
+                    TT.Add(JsonConvert.DeserializeObject<T>(s));
+                }
+                catch
+                {
+
+                }
             }
             return TT;
         }
